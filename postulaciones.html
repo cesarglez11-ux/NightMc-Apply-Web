@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postulaciones | NightMC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --accent: #ffcc00; --bg: #050505; --danger: #ff4444; --glass: rgba(255, 255, 255, 0.02); }
+        
+        body {
+            margin: 0; font-family: 'Poppins', sans-serif; color: white;
+            min-height: 100vh; overflow-x: hidden;
+            background: transparent; /* Transparente para ver las estrellas */
+        }
+
+        /* Fondo Animado */
+        #stars {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+        }
+
+        /* Navbar Glassmorphism */
+        .navbar {
+            padding: 20px 5%; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(20px);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .nav-left { display: flex; align-items: center; gap: 20px; }
+        .brand { font-weight: 800; font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
+        .brand img { width: 35px; }
+
+        .back-hub {
+            text-decoration: none; color: #888; font-size: 0.75rem; font-weight: 700;
+            display: flex; align-items: center; gap: 8px; transition: 0.3s;
+            padding: 10px 15px; border-radius: 12px; background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05); text-transform: uppercase;
+        }
+        .back-hub:hover { color: var(--accent); border-color: var(--accent); transform: translateX(-5px); }
+
+        .nav-actions { display: flex; align-items: center; gap: 15px; }
+        .key-btn {
+            background: rgba(255, 204, 0, 0.1); border: 2px solid var(--accent);
+            color: var(--accent); width: 45px; height: 45px; border-radius: 12px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.3s;
+        }
+        .key-btn:hover { background: var(--accent); color: black; }
+
+        .logout-btn { background: var(--danger); color: white; border: none; padding: 10px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; display: none; font-size: 0.75rem; }
+
+        /* Contenido Principal */
+        .container { max-width: 1100px; margin: 80px auto; padding: 0 40px; text-align: center; }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 30px; 
+            margin-top: 60px;
+            justify-content: center;
+        }
+
+        .card {
+            background: var(--glass); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 35px; padding: 50px 30px; transition: 0.4s;
+            display: flex; flex-direction: column; align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        .card:hover { border-color: var(--accent); background: rgba(255,255,255,0.04); transform: translateY(-10px); }
+
+        .icon-box {
+            width: 70px; height: 70px; background: rgba(255, 204, 0, 0.05);
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            color: var(--accent); font-size: 2rem; margin-bottom: 25px;
+        }
+
+        .btn-main {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 18px; border-radius: 15px; font-weight: 800; text-decoration: none;
+            width: 100%; border: none; transition: 0.3s; margin-top: auto;
+        }
+        .open-state { background: var(--accent); color: black; }
+        .closed-state { background: #151515; color: #444; cursor: not-allowed; border: 1px solid #222; }
+
+        .admin-controls { margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; width: 100%; display: none; }
+        .toggle-btn { background: #000; color: #666; border: 1px solid #333; padding: 10px; width: 100%; border-radius: 10px; cursor: pointer; font-size: 0.8rem; }
+
+        /* Modal */
+        #authModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-box { background: #0a0a0a; padding: 40px; border-radius: 30px; border: 1px solid #222; width: 320px; text-align: center; }
+        #passInput { width: 100%; padding: 12px; margin: 20px 0; background: #000; border: 1px solid #333; color: white; border-radius: 10px; text-align: center; outline: none; box-sizing: border-box; }
+        
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+    </style>
+</head>
+<body>
+
+    <canvas id="stars"></canvas>
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="index.html" class="back-hub"><i class="fas fa-arrow-left"></i> Volver al Hub</a>
+            <div class="brand"><img src="https://i.imgur.com/RHwDtxm.png"> NightMC</div>
+             <p>Ingresa a el discord oficial de NightMC: <a href="https://discord.gg/2r2byXBgsv" target="_blank">Discord Oficial</a>ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤIP: <span class="ip-value">nightmc.me</span></p>
+        </div>
+        <div class="nav-actions">
+            <button id="logoutBtn" class="logout-btn" onclick="logoutAdmin()">SALIR ADMIN</button>
+            <button class="key-btn" onclick="toggleModal()"><i class="fas fa-key"></i></button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 style="font-size: 3.5rem; margin: 0; font-weight: 800; letter-spacing: -2px;">Postulaciones</h1>
+        <p style="color: #888; margin-top: 10px; font-size: 1.1rem;">Únete a nuestro equipo técnico y administrativo.</p>
+
+        <div class="grid">
+            <div class="card">
+                <div class="icon-box"><i class="fas fa-users-gear"></i></div>
+                <h2 style="margin: 0 0 10px 0;">Staff Team</h2>
+                <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 25px;">Moderación, gestión de comunidad y soporte general.</p>
+                <a href="https://forms.gle/gWWZra5G6PX3hJvU8" target="_blank" class="btn-main" id="btn-staff">
+                    <i id="icon-staff" class="fas fa-paper-plane"></i> <span id="txt-staff">Enviar Postulación</span>
+                </a>
+                <div class="admin-controls"><button class="toggle-btn" onclick="handleToggle('staff')">Abrir / Cerrar</button></div>
+            </div>
+
+            <div class="card">
+                <div class="icon-box"><i class="fas fa-search"></i></div>
+                <h2 style="margin: 0 0 10px 0;">SS Team</h2>
+                <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 25px;">Especialistas en detección de hacks y revisiones técnicas.</p>
+                <a href="https://forms.gle/kqu5MLEE6eCPWtMv6" target="_blank" class="btn-main" id="btn-ss">
+                    <i id="icon-ss" class="fas fa-paper-plane"></i> <span id="txt-ss">Enviar Postulación</span>
+                </a>
+                <div class="admin-controls"><button class="toggle-btn" onclick="handleToggle('ss')">Abrir / Cerrar</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="authModal">
+        <div class="modal-box" id="modalBox">
+            <h3 style="margin:0;">Acceso Administrativo</h3>
+            <input type="password" id="passInput" placeholder="Clave de acceso">
+            <button class="btn-main open-state" onclick="verify()">VERIFICAR ACCESO</button>
+            <button onclick="toggleModal()" style="margin-top:15px; background:none; border:none; color:#444; cursor:pointer; font-weight:700;">CANCELAR</button>
+        </div>
+    </div>
+
+    <script>
+        const MASTER_PASS = "xItsSotox";
+
+        // --- SISTEMA DE ESTRELLAS ANIMADAS ---
+        const canvas = document.getElementById('stars');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function setupStars() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 150; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    speed: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            stars.forEach(s => {
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fill();
+                s.y -= s.speed;
+                if (s.y < 0) s.y = canvas.height;
+            });
+            requestAnimationFrame(drawStars);
+        }
+
+        // --- LÓGICA DE ADMINISTRACIÓN ---
+        function toggleModal() {
+            const m = document.getElementById('authModal');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function verify() {
+            if(document.getElementById('passInput').value === MASTER_PASS) {
+                localStorage.setItem('nightmc_role', 'admin');
+                location.reload();
+            } else {
+                document.getElementById('modalBox').style.animation = "shake 0.3s";
+                setTimeout(() => document.getElementById('modalBox').style.animation = "", 300);
+            }
+        }
+
+        function logoutAdmin() { localStorage.removeItem('nightmc_role'); location.reload(); }
+
+        function syncUI() {
+            const isAdmin = localStorage.getItem('nightmc_role') === 'admin';
+            document.getElementById('logoutBtn').style.display = isAdmin ? 'block' : 'none';
+            document.querySelectorAll('.admin-controls').forEach(t => t.style.display = isAdmin ? 'block' : 'none');
+
+            ['staff', 'ss'].forEach(id => {
+                const isClosed = localStorage.getItem('state-' + id) === 'closed';
+                const btn = document.getElementById('btn-' + id);
+                document.getElementById('txt-' + id).innerText = isClosed ? 'CERRADO' : 'ENVIAR POSTULACIÓN';
+                document.getElementById('icon-' + id).className = isClosed ? 'fas fa-lock' : 'fas fa-paper-plane';
+                btn.className = isClosed ? "btn-main closed-state" : "btn-main open-state";
+                btn.style.pointerEvents = isClosed ? 'none' : 'auto';
+            });
+        }
+
+        function handleToggle(id) {
+            const current = localStorage.getItem('state-' + id);
+            localStorage.setItem('state-' + id, current === 'closed' ? 'open' : 'closed');
+            syncUI();
+        }
+
+        window.addEventListener('resize', setupStars);
+        window.onload = () => {
+            setupStars();
+            drawStars();
+            syncUI();
+        };
+    </script>
+</body>
+</html>
